@@ -1,0 +1,101 @@
+- name: Stop confluent-kafka
+  service:
+    name: confluent-kafka
+    state: stopped
+    enabled: no
+
+- name: Delete the log directory & backup directory
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+   - /var/log/kafka
+   - /data3/backup 
+
+- name: Create the log (kafka) directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: "u=rw,g=wx,o=rwx"
+  with_items:
+   - /var/log/kafka
+   - /data3/backup
+ 
+- name: Copy data in to backup directory
+  copy:
+    src: "/etc/kafka/"
+    dest: "/data3/backup/"
+    remote_src: yes
+    directory_mode: yes
+
+- name: Archive the logs dir and copy into the /data1/backup dir
+  archive:
+    path: "/data1/kafka-logs"
+    dest: "/data3/backup/kafka-logs.tgz"
+
+- name: Remove the confluent-repo file
+  file:
+    path: "/etc/yum.repos.d/confluent.repo"
+    state: absent
+
+- name: remove pubkey package
+  yum:
+    name: "gpg-pubkey-41468433-54d512a8"
+    state: absent
+
+- name: Import a archive key from a url
+  rpm_key:
+    state: present
+    key: https://packages.confluent.io/rpm/5.5/archive.key
+
+- name: Copy file with owner and permissions
+  copy:
+    src: confluent-5.5.repo
+    dest: /etc/yum.repos.d/
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Remove confluent packages
+  yum: 
+    name: "{{ item }}" 
+    state: absent
+    autoremove: true
+  with_items:
+   - confluent-community-2.12
+   - confluent-community-2.13
+
+- name: yum-clean-metadata
+  command: yum clean metadata
+  args:
+    warn: no
+
+- name: Install confluent-community-2.12.
+  yum:
+    name: confluent-community-2.12
+    state: present
+
+- name: Copy the server.properties from backup directory
+  copy:
+    src: "/data3/backup/server.properties"
+    dest: "/etc/kafka/"
+    remote_src: yes
+    
+- name: Copy the chown file
+  copy:
+   src: chownScript.sh
+   dest: /etc/yum.repos.d/
+   owner: root
+   group: root
+   mode: '0755'
+
+- name: Execute the command in remote shell; stdout goes to the specified file on the remote.
+  shell: /etc/yum.repos.d/chownScript.sh
+
+- name: Start confluent-kafka
+  service:
+    name: confluent-kafka
+    state: started
+    enabled: yes
+
+

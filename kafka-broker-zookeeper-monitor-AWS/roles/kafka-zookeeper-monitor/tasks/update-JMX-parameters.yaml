@@ -1,0 +1,8 @@
+- name:  Update zookeeper JMX parameters
+  lineinfile:
+    path: /usr/lib/systemd/system/confluent-zookeeper.service
+    line: Environment="EXTRA_ARGS=-javaagent:/etc/kafka/jmx_prometheus_javaagent-0.9.jar=7070:/etc/kafka/zookeeper.yml"
+    insertafter: Group=*
+
+- name: Reload systemctl after zookeeper JMX parameters
+  shell: "systemctl daemon-reload"

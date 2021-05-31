@@ -1,0 +1,7 @@
+---
+- hosts: kafka-zookeeper
+  user: ec2-user
+  gather_facts: yes
+  become: true
+  roles:
+  - kafka-zookeeper-monitor

@@ -1,0 +1,4 @@
+---
+- include: install-broker-JMX-exporter.yaml
+- include: update-JMX-parameters.yaml
+- include: start-broker.yaml

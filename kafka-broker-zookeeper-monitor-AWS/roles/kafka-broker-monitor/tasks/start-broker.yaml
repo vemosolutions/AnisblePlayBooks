@@ -1,0 +1,10 @@
+---
+- name: Start confluent-kafka service
+  shell: "systemctl restart confluent-kafka"
+  register: start_broker
+  tags: start_broker
+
+- name: Service confluent-kafka status
+  shell: "systemctl status confluent-kafka"
+  register: status_broker
+  tags: status_broker

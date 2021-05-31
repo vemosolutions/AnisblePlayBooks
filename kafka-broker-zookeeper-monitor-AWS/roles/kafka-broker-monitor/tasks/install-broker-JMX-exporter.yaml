@@ -1,0 +1,27 @@
+- name: download prometheus JMX Jar
+  become: true
+  get_url:
+    url: "https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.9/jmx_prometheus_javaagent-0.9.jar"
+    dest: "/etc/kafka"
+
+- name: download broker JMX exporter 
+  become: true
+  get_url:
+    url: "https://github.com/prometheus/jmx_exporter/raw/master/example_configs/kafka-2_0_0.yml"
+    dest: "/etc/kafka"
+
+- name: Add the user 'prometheus' and add to 'kafka' group
+  user:
+    name: prometheus
+    groups: kafka
+    append: yes
+
+- name: Update the ownership of JMX related files
+  file:
+    path: "{{ item }}"
+    owner: prometheus
+    group: kafka
+    mode: '0775'
+  with_items:
+   - /etc/kafka/kafka-2_0_0.yml
+   - /etc/kafka/jmx_prometheus_javaagent-0.9.jar

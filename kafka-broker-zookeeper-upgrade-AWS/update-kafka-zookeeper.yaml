@@ -1,0 +1,8 @@
+---
+- hosts: zookeeper
+  user: ec2-user
+  gather_facts: yes
+  become: true
+  roles:
+  - zookeeper6.1
+

@@ -1,0 +1,8 @@
+- name:  Update broker JMX parameters
+  lineinfile:
+    path: /usr/lib/systemd/system/confluent-kafka.service
+    line: Environment="EXTRA_ARGS=-javaagent:/etc/kafka/jmx_prometheus_javaagent-0.9.jar=7071:/etc/kafka/kafka-2_0_0.yml"
+    insertafter: Group=*
+
+- name: Reload systemctl after broker JMX parameters
+  shell: "systemctl daemon-reload"

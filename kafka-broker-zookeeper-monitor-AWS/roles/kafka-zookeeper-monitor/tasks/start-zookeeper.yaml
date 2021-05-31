@@ -1,0 +1,10 @@
+---
+- name: Start confluent-zookeeper service
+  shell: "systemctl restart confluent-zookeeper"
+  register: start_zookeeper
+  tags: start_zookeeper
+
+- name: Service confluent-zookeeper status
+  shell: "systemctl status confluent-zookeeper"
+  register: status_zookeeper
+  tags: status_zookeeper
